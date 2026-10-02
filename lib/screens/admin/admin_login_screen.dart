@@ -48,15 +48,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
     if (!mounted) return;
 
-    if (email.toLowerCase() != AppConstants.demoAdminEmail ||
-        password != AppConstants.demoAdminPassword) {
-      setState(() {
-        isLoading = false;
-        errorText = 'Invalid admin credentials';
-      });
-      return;
-    }
-
+    // Simulated login - any non-empty email & password opens the dashboard.
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const AdminDashboard()),

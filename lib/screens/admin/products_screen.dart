@@ -196,6 +196,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         foregroundColor: AppColors.adminPrimary,
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'admin-products-add',
         backgroundColor: AppColors.adminPrimary,
         foregroundColor: Colors.white,
         onPressed: () {

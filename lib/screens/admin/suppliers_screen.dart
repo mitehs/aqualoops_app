@@ -299,6 +299,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
         foregroundColor: AppColors.adminPrimary,
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'admin-suppliers-add',
         backgroundColor: AppColors.adminPrimary,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.person_add_alt_1),
