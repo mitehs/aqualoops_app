@@ -116,10 +116,10 @@ class _DashboardHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final topPadding = MediaQuery.of(context).padding.top + 14;
+    final topPadding = MediaQuery.of(context).padding.top;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(18, 0, 18, 24),
+      padding: const EdgeInsets.fromLTRB(8, 8, 0, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -136,7 +136,7 @@ class _DashboardHome extends StatelessWidget {
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(24),
+                bottom: Radius.circular(9),
               ),
             ),
             child: Row(
@@ -194,7 +194,7 @@ class _DashboardHome extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 3),
 
           // =====================================
           // STATS
