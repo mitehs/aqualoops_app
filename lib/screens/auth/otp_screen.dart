@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../utils/app_colors.dart';
+import '../../utils/app_routes.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});
 
   @override
-  State<OtpScreen> createState() =>
-      _OtpScreenState();
+  State<OtpScreen> createState() => _OtpScreenState();
 }
 
-class _OtpScreenState
-    extends State<OtpScreen> {
-
-  final List<TextEditingController>
-      controllers = List.generate(
+class _OtpScreenState extends State<OtpScreen> {
+  final List<TextEditingController> controllers = List.generate(
     4,
     (_) => TextEditingController(),
   );
@@ -21,19 +18,13 @@ class _OtpScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'OTP Verification',
-        ),
-      ),
+      appBar: AppBar(title: const Text('OTP Verification')),
 
       body: Padding(
-        padding:
-            const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
 
         child: Column(
           children: [
-
             const SizedBox(height: 40),
 
             const Icon(
@@ -46,11 +37,7 @@ class _OtpScreenState
 
             const Text(
               'Enter OTP',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight:
-                    FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 10),
@@ -59,70 +46,48 @@ class _OtpScreenState
               'Enter the 4-digit OTP sent to '
               'your registered mobile number.',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: AppColors.grey,
-                height: 1.5,
-              ),
+              style: TextStyle(color: AppColors.grey, height: 1.5),
             ),
 
             const SizedBox(height: 35),
 
             Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
 
-              children: List.generate(
-                4,
-                (index) {
+              children: List.generate(4, (index) {
+                return Container(
+                  width: 55,
+                  height: 60,
 
-                  return Container(
-                    width: 55,
-                    height: 60,
+                  margin: const EdgeInsets.symmetric(horizontal: 5),
 
-                    margin:
-                        const EdgeInsets.symmetric(
-                      horizontal: 5,
+                  child: TextField(
+                    controller: controllers[index],
+
+                    textAlign: TextAlign.center,
+
+                    keyboardType: TextInputType.number,
+
+                    maxLength: 1,
+
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
                     ),
 
-                    child: TextField(
-                      controller:
-                          controllers[index],
-
-                      textAlign:
-                          TextAlign.center,
-
-                      keyboardType:
-                          TextInputType.number,
-
-                      maxLength: 1,
-
-                      style:
-                          const TextStyle(
-                        fontSize: 22,
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
-
-                      decoration:
-                          const InputDecoration(
-                        counterText: '',
-                        border:
-                            OutlineInputBorder(),
-                      ),
-
-                      onChanged: (value) {
-
-                        if (value.isNotEmpty &&
-                            index < 3) {
-
-                          FocusScope.of(context)
-                              .nextFocus();
-                        }
-                      },
+                    decoration: const InputDecoration(
+                      counterText: '',
+                      border: OutlineInputBorder(),
                     ),
-                  );
-                },
-              ),
+
+                    onChanged: (value) {
+                      if (value.isNotEmpty && index < 3) {
+                        FocusScope.of(context).nextFocus();
+                      }
+                    },
+                  ),
+                );
+              }),
             ),
 
             const SizedBox(height: 30),
@@ -133,31 +98,22 @@ class _OtpScreenState
 
               child: ElevatedButton(
                 onPressed: () {
-
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(
-                    const SnackBar(
-                      content:
-                          Text(
-                        'OTP verified successfully',
-                      ),
-                    ),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('OTP verified successfully')),
                   );
 
-                  Navigator.pop(context);
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.login,
+                    (route) => false,
+                  );
                 },
 
-                style:
-                    ElevatedButton.styleFrom(
-                  backgroundColor:
-                      AppColors.primary,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
 
-                  shape:
-                      RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(
-                      15,
-                    ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
                   ),
                 ),
 
@@ -166,8 +122,7 @@ class _OtpScreenState
 
                   style: TextStyle(
                     color: Colors.white,
-                    fontWeight:
-                        FontWeight.bold,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -175,13 +130,7 @@ class _OtpScreenState
 
             const SizedBox(height: 20),
 
-            TextButton(
-              onPressed: () {},
-              child:
-                  const Text(
-                'Resend OTP',
-              ),
-            ),
+            TextButton(onPressed: () {}, child: const Text('Resend OTP')),
           ],
         ),
       ),

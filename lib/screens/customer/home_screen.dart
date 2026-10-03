@@ -15,12 +15,10 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() =>
-      _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   int selectedIndex = 0;
 
   final List<Widget> pages = const [
@@ -34,22 +32,16 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: pages[selectedIndex],
 
-      bottomNavigationBar:
-          BottomNavigationBar(
-
+      bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
 
-        type:
-            BottomNavigationBarType.fixed,
+        type: BottomNavigationBarType.fixed,
 
-        selectedItemColor:
-            AppColors.primary,
+        selectedItemColor: AppColors.primary,
 
-        unselectedItemColor:
-            Colors.grey,
+        unselectedItemColor: Colors.grey,
 
         showUnselectedLabels: true,
 
@@ -60,43 +52,33 @@ class _HomeScreenState extends State<HomeScreen> {
         },
 
         items: const [
-
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
-            activeIcon:
-                Icon(Icons.home),
+            activeIcon: Icon(Icons.home),
             label: 'Home',
           ),
 
           BottomNavigationBarItem(
-            icon:
-                Icon(Icons.water_drop_outlined),
-            activeIcon:
-                Icon(Icons.water_drop),
+            icon: Icon(Icons.water_drop_outlined),
+            activeIcon: Icon(Icons.water_drop),
             label: 'Products',
           ),
 
           BottomNavigationBarItem(
-            icon:
-                Icon(Icons.shopping_cart_outlined),
-            activeIcon:
-                Icon(Icons.shopping_cart),
+            icon: Icon(Icons.shopping_cart_outlined),
+            activeIcon: Icon(Icons.shopping_cart),
             label: 'Cart',
           ),
 
           BottomNavigationBarItem(
-            icon:
-                Icon(Icons.receipt_long_outlined),
-            activeIcon:
-                Icon(Icons.receipt_long),
+            icon: Icon(Icons.receipt_long_outlined),
+            activeIcon: Icon(Icons.receipt_long),
             label: 'Orders',
           ),
 
           BottomNavigationBarItem(
-            icon:
-                Icon(Icons.person_outline),
-            activeIcon:
-                Icon(Icons.person),
+            icon: Icon(Icons.person_outline),
+            activeIcon: Icon(Icons.person),
             label: 'Profile',
           ),
         ],
@@ -104,7 +86,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
 
 // =====================================================
 // HOME CONTENT
@@ -114,25 +95,19 @@ class HomeContent extends StatefulWidget {
   const HomeContent({super.key});
 
   @override
-  State<HomeContent> createState() =>
-      _HomeContentState();
+  State<HomeContent> createState() => _HomeContentState();
 }
 
-class _HomeContentState
-    extends State<HomeContent> {
-
-  final TextEditingController searchController =
-      TextEditingController();
+class _HomeContentState extends State<HomeContent> {
+  final TextEditingController searchController = TextEditingController();
 
   String searchText = '';
 
   final List<Product> products = [
-
     Product(
       id: 1,
       name: '20L Mineral Water',
-      description:
-          'Pure mineral water for your daily needs.',
+      description: 'Pure mineral water for your daily needs.',
       price: 30,
       image: '',
       stock: 100,
@@ -143,8 +118,7 @@ class _HomeContentState
     Product(
       id: 2,
       name: '1L Water Bottle',
-      description:
-          'Fresh drinking water in a convenient bottle.',
+      description: 'Fresh drinking water in a convenient bottle.',
       price: 20,
       image: '',
       stock: 150,
@@ -155,8 +129,7 @@ class _HomeContentState
     Product(
       id: 3,
       name: '500ml Water Bottle',
-      description:
-          'Fresh and pure drinking water.',
+      description: 'Fresh and pure drinking water.',
       price: 10,
       image: '',
       stock: 200,
@@ -167,8 +140,7 @@ class _HomeContentState
     Product(
       id: 4,
       name: '20L Premium Water',
-      description:
-          'Premium quality drinking water.',
+      description: 'Premium quality drinking water.',
       price: 40,
       image: '',
       stock: 80,
@@ -181,76 +153,53 @@ class _HomeContentState
   void initState() {
     super.initState();
 
-    // Load the demo product list from ProductProvider.
-    context.read<ProductProvider>().loadProducts();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<ProductProvider>().loadProducts();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-
     // Products come from ProductProvider (with local demo data as a
     // fallback while the provider is still loading).
     final providerProducts = context.watch<ProductProvider>().products;
 
-    final sourceProducts = providerProducts.isEmpty ? products : providerProducts;
+    final sourceProducts = providerProducts.isEmpty
+        ? products
+        : providerProducts;
 
     List<Product> filteredProducts = sourceProducts.where((product) {
-
-      return product.name
-          .toLowerCase()
-          .contains(
-            searchText.toLowerCase(),
-          );
-
+      return product.name.toLowerCase().contains(searchText.toLowerCase());
     }).toList();
 
     return SafeArea(
-
       child: SingleChildScrollView(
-
-        padding:
-            const EdgeInsets.fromLTRB(
-          18,
-          10,
-          18,
-          25,
-        ),
+        padding: const EdgeInsets.fromLTRB(18, 10, 18, 25),
 
         child: Column(
-
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
 
           children: [
-
             // =====================================
             // HEADER
             // =====================================
-
             Row(
-
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
               children: [
-
                 Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
 
                   children: [
-
                     Row(
                       children: [
-
                         const Text(
                           'Aqua',
                           style: TextStyle(
                             fontSize: 22,
-                            fontWeight:
-                                FontWeight.bold,
-                            color:
-                                AppColors.secondary,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondary,
                           ),
                         ),
 
@@ -258,10 +207,8 @@ class _HomeContentState
                           'Loop',
                           style: TextStyle(
                             fontSize: 22,
-                            fontWeight:
-                                FontWeight.bold,
-                            color:
-                                AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
                           ),
                         ),
                       ],
@@ -271,44 +218,30 @@ class _HomeContentState
 
                     const Text(
                       'Pure Water Delivery',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color:
-                            AppColors.grey,
-                      ),
+                      style: TextStyle(fontSize: 11, color: AppColors.grey),
                     ),
                   ],
                 ),
 
                 Row(
                   children: [
-
                     // Notification
                     IconButton(
                       onPressed: () {},
 
-                      icon: const Icon(
-                        Icons.notifications_none,
-                      ),
+                      icon: const Icon(Icons.notifications_none),
                     ),
 
                     // Cart
                     IconButton(
                       onPressed: () {
-
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                const CartScreen(),
-                          ),
+                          MaterialPageRoute(builder: (_) => const CartScreen()),
                         );
-
                       },
 
-                      icon: const Icon(
-                        Icons.shopping_cart_outlined,
-                      ),
+                      icon: const Icon(Icons.shopping_cart_outlined),
                     ),
                   ],
                 ),
@@ -320,15 +253,10 @@ class _HomeContentState
             // =====================================
             // GREETING
             // =====================================
-
             const Text(
               'Hello, User 👋',
 
-              style: TextStyle(
-                fontSize: 25,
-                fontWeight:
-                    FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 5),
@@ -336,82 +264,53 @@ class _HomeContentState
             const Text(
               'What would you like today?',
 
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.grey,
-              ),
+              style: TextStyle(fontSize: 14, color: AppColors.grey),
             ),
 
             const SizedBox(height: 18),
+
             // const Text('____________________________________________________________'),
             // =====================================
             // SEARCH
             // =====================================
-
             TextField(
-
-              controller:
-                  searchController,
+              controller: searchController,
 
               onChanged: (value) {
-
                 setState(() {
                   searchText = value;
                 });
-
               },
 
-              decoration:
-                  InputDecoration(
+              decoration: InputDecoration(
+                hintText: 'Search for water...',
 
-                hintText:
-                    'Search for water...',
+                prefixIcon: const Icon(Icons.search, color: AppColors.primary),
 
-                prefixIcon:
-                    const Icon(
-                  Icons.search,
-                  color:
-                      AppColors.primary,
-                ),
+                suffixIcon: searchText.isNotEmpty
+                    ? IconButton(
+                        onPressed: () {
+                          searchController.clear();
 
-                suffixIcon:
-                    searchText.isNotEmpty
-                        ? IconButton(
-                            onPressed: () {
+                          setState(() {
+                            searchText = '';
+                          });
+                        },
 
-                              searchController
-                                  .clear();
-
-                              setState(() {
-                                searchText = '';
-                              });
-
-                            },
-
-                            icon:
-                                const Icon(
-                              Icons.clear,
-                            ),
-                          )
-                        : null,
+                        icon: const Icon(Icons.clear),
+                      )
+                    : null,
 
                 filled: true,
 
-                fillColor:
-                    Colors.white,
+                fillColor: Colors.white,
 
-                contentPadding:
-                    const EdgeInsets.symmetric(
-                  vertical: 15,
-                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 15),
 
-                border:
-                    OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius.circular(15),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
 
-                  borderSide:
-                      BorderSide.none,
+                  borderSide: BorderSide.none,
                 ),
               ),
             ),
@@ -421,40 +320,25 @@ class _HomeContentState
             // =====================================
             // CATEGORIES
             // =====================================
-
             Row(
-
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
               children: [
-
                 const Text(
                   'Categories',
 
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight:
-                        FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
 
                 TextButton(
                   onPressed: () {
-
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            const ProductScreen(),
-                      ),
+                      MaterialPageRoute(builder: (_) => const ProductScreen()),
                     );
-
                   },
 
-                  child: const Text(
-                    'See All',
-                  ),
+                  child: const Text('See All'),
                 ),
               ],
             ),
@@ -462,43 +346,34 @@ class _HomeContentState
             const SizedBox(height: 10),
 
             SizedBox(
-
               height: 105,
 
-              child:
-                  SingleChildScrollView(
-
-                scrollDirection:
-                    Axis.horizontal,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
 
                 child: Row(
                   children: [
-
                     CategoryCard(
                       title: '20L Water',
-                      icon:
-                          Icons.water_drop,
+                      icon: Icons.water_drop,
                       onTap: () {},
                     ),
 
                     CategoryCard(
                       title: '1L Water',
-                      icon:
-                          Icons.local_drink,
+                      icon: Icons.local_drink,
                       onTap: () {},
                     ),
 
                     CategoryCard(
                       title: '500ml',
-                      icon:
-                          Icons.water,
+                      icon: Icons.water,
                       onTap: () {},
                     ),
 
                     CategoryCard(
                       title: 'Premium',
-                      icon:
-                          Icons.auto_awesome,
+                      icon: Icons.auto_awesome,
                       onTap: () {},
                     ),
                   ],
@@ -511,48 +386,33 @@ class _HomeContentState
             // =====================================
             // PROMOTIONAL BANNER
             // =====================================
-
             Container(
-
               width: double.infinity,
 
-              padding:
-                  const EdgeInsets.all(18),
+              padding: const EdgeInsets.all(18),
 
               decoration: BoxDecoration(
-
-                gradient:
-                    const LinearGradient(
-                  colors: [
-                    AppColors.primary,
-                    AppColors.secondary,
-                  ],
+                gradient: const LinearGradient(
+                  colors: [AppColors.primary, AppColors.secondary],
                 ),
 
-                borderRadius:
-                    BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(20),
               ),
 
               child: Row(
-
                 children: [
-
                   Expanded(
                     child: Column(
-
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
 
                       children: [
-
                         const Text(
                           'Pure Water,\nDelivered Fast!',
 
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,
-                            fontWeight:
-                                FontWeight.bold,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
 
@@ -561,40 +421,28 @@ class _HomeContentState
                         const Text(
                           'Get fresh water at\nyour doorstep.',
 
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                          ),
+                          style: TextStyle(color: Colors.white, fontSize: 13),
                         ),
 
                         const SizedBox(height: 12),
 
                         ElevatedButton(
                           onPressed: () {
-
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    const ProductScreen(),
+                                builder: (_) => const ProductScreen(),
                               ),
                             );
-
                           },
 
-                          style:
-                              ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Colors.white,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
 
-                            foregroundColor:
-                                AppColors.secondary,
+                            foregroundColor: AppColors.secondary,
                           ),
 
-                          child:
-                              const Text(
-                            'Shop Now',
-                          ),
+                          child: const Text('Shop Now'),
                         ),
                       ],
                     ),
@@ -602,11 +450,7 @@ class _HomeContentState
 
                   const SizedBox(width: 10),
 
-                  const Icon(
-                    Icons.water_drop,
-                    color: Colors.white,
-                    size: 90,
-                  ),
+                  const Icon(Icons.water_drop, color: Colors.white, size: 90),
                 ],
               ),
             ),
@@ -616,39 +460,25 @@ class _HomeContentState
             // =====================================
             // POPULAR PRODUCTS
             // =====================================
-
             Row(
-
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
               children: [
-
                 const Text(
                   'Popular Products',
 
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight:
-                        FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
 
                 TextButton(
                   onPressed: () {
-
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            const ProductScreen(),
-                      ),
+                      MaterialPageRoute(builder: (_) => const ProductScreen()),
                     );
-
                   },
 
-                  child:
-                      const Text('See All'),
+                  child: const Text('See All'),
                 ),
               ],
             ),
@@ -656,50 +486,30 @@ class _HomeContentState
             const SizedBox(height: 10),
 
             if (filteredProducts.isEmpty)
-
               const Padding(
-                padding:
-                    EdgeInsets.all(30),
+                padding: EdgeInsets.all(30),
 
                 child: Center(
                   child: Text(
                     'No products found',
-                    style: TextStyle(
-                      color:
-                          AppColors.grey,
-                    ),
+                    style: TextStyle(color: AppColors.grey),
                   ),
                 ),
               )
-
             else
-
               SizedBox(
-
                 height: 265,
 
-                child:
-                    ListView.builder(
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
 
-                  scrollDirection:
-                      Axis.horizontal,
+                  itemCount: filteredProducts.length,
 
-                  itemCount:
-                      filteredProducts.length,
-
-                  itemBuilder:
-                      (context, index) {
-
+                  itemBuilder: (context, index) {
                     return Padding(
-                      padding:
-                          const EdgeInsets.only(
-                        right: 14,
-                      ),
+                      padding: const EdgeInsets.only(right: 14),
 
-                      child: ProductCard(
-                        product:
-                            filteredProducts[index],
-                      ),
+                      child: ProductCard(product: filteredProducts[index]),
                     );
                   },
                 ),
@@ -710,36 +520,21 @@ class _HomeContentState
             // =====================================
             // WHY AQUA LOOP
             // =====================================
-
             const Text(
               'Why AquaLoop?',
 
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight:
-                    FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 15),
 
             Row(
               children: [
+                benefitCard(Icons.verified, 'Pure Water'),
 
-                benefitCard(
-                  Icons.verified,
-                  'Pure Water',
-                ),
+                benefitCard(Icons.local_shipping, 'Fast Delivery'),
 
-                benefitCard(
-                  Icons.local_shipping,
-                  'Fast Delivery',
-                ),
-
-                benefitCard(
-                  Icons.support_agent,
-                  '24/7 Support',
-                ),
+                benefitCard(Icons.support_agent, '24/7 Support'),
               ],
             ),
           ],
@@ -748,59 +543,30 @@ class _HomeContentState
     );
   }
 
-  Widget benefitCard(
-    IconData icon,
-    String title,
-  ) {
-
+  Widget benefitCard(IconData icon, String title) {
     return Expanded(
-
       child: Container(
+        margin: const EdgeInsets.only(right: 8),
 
-        margin:
-            const EdgeInsets.only(
-          right: 8,
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 5),
 
-        padding:
-            const EdgeInsets.symmetric(
-          vertical: 15,
-          horizontal: 5,
-        ),
-
-        decoration:
-            BoxDecoration(
-
+        decoration: BoxDecoration(
           color: Colors.white,
 
-          borderRadius:
-              BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(15),
         ),
 
         child: Column(
-
           children: [
-
-            Icon(
-              icon,
-              color:
-                  AppColors.primary,
-              size: 28,
-            ),
+            Icon(icon, color: AppColors.primary, size: 28),
 
             const SizedBox(height: 8),
 
             Text(
               title,
-              textAlign:
-                  TextAlign.center,
+              textAlign: TextAlign.center,
 
-              style:
-                  const TextStyle(
-                fontSize: 11,
-                fontWeight:
-                    FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
             ),
           ],
         ),
