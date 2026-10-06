@@ -6,6 +6,7 @@ import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
 import '../screens/auth/forgot_password_screen.dart';
 import '../screens/auth/otp_screen.dart';
+import '../screens/auth/set_new_password_screen.dart';
 
 // Customer
 import '../screens/customer/home_screen.dart';
@@ -46,6 +47,7 @@ class AppRoutes {
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
   static const String otp = '/otp';
+  static const String setNewPassword = '/set-new-password';
 
   // Customer
   static const String home = '/home';
@@ -90,6 +92,8 @@ class AppRoutes {
         return _page(ForgotPasswordScreen());
       case otp:
         return _page(const OtpScreen());
+      case setNewPassword:
+        return _page(const SetNewPasswordScreen());
 
       // Customer
       case home:

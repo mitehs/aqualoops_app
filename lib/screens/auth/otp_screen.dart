@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../utils/app_colors.dart';
-import '../../utils/app_routes.dart';
+import 'set_new_password_screen.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});
@@ -102,10 +102,11 @@ class _OtpScreenState extends State<OtpScreen> {
                     const SnackBar(content: Text('OTP verified successfully')),
                   );
 
-                  Navigator.pushNamedAndRemoveUntil(
+                  Navigator.pushReplacement(
                     context,
-                    AppRoutes.login,
-                    (route) => false,
+                    MaterialPageRoute(
+                      builder: (_) => const SetNewPasswordScreen(),
+                    ),
                   );
                 },
 
