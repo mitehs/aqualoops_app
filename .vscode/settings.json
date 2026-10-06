@@ -1,4 +1,5 @@
 {
     "cmake.sourceDirectory": "C:/new flutter/aqualoops_app/windows",
-    "cmake.autoDetectSourceDirectory": false
+    "cmake.autoDetectSourceDirectory": false,
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

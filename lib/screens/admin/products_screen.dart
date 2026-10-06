@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../models/product.dart';
-import '../../utils/app_colors.dart';
-import 'add_product_screen.dart';
+import 'package:aqualoops_app/models/product.dart';
+import 'package:aqualoops_app/utils/app_colors.dart';
+import 'package:aqualoops_app/screens/admin/add_product_screen.dart';
 
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
@@ -97,21 +97,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     super.dispose();
   }
 
-  List<Product> get filteredProducts {
-    final query = searchText.trim().toLowerCase();
-
-    return products.where((product) {
-      final matchesCategory =
-          selectedCategory == 'All' || product.category == selectedCategory;
-      final matchesSearch =
-          query.isEmpty ||
-          product.name.toLowerCase().contains(query) ||
-          product.category.toLowerCase().contains(query);
-
-      return matchesCategory && matchesSearch;
-    }).toList();
-  }
-
   void confirmDelete(Product product) {
     showDialog<void>(
       context: context,
@@ -124,7 +109,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
           content: Text('Are you sure you want to delete ${product.name}?'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
               child: const Text('Cancel'),
             ),
             TextButton(
@@ -151,21 +138,21 @@ class _ProductsScreenState extends State<ProductsScreen> {
   void editProduct(Product product) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const AddProductScreen()),
+      MaterialPageRoute(builder: (context) => const AddProductScreen()),
     );
   }
 
   Widget statusChip(int stock) {
     if (stock == 0) {
-      return _chip('Out of Stock', AppColors.danger);
+      return chip('Out of Stock', AppColors.danger);
     }
     if (stock <= 20) {
-      return _chip('Low Stock', Colors.orange);
+      return chip('Low Stock', Colors.orange);
     }
-    return _chip('In Stock', AppColors.success);
+    return chip('In Stock', AppColors.success);
   }
 
-  Widget _chip(String label, Color color) {
+  Widget chip(String label, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
@@ -185,7 +172,175 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final results = filteredProducts;
+    // The products that match the selected category and the search text.
+    String query = searchText.trim().toLowerCase();
+    List<Product> results = [];
+    for (int i = 0; i < products.length; i++) {
+      Product product = products[i];
+      bool matchesCategory =
+          selectedCategory == 'All' || product.category == selectedCategory;
+      bool matchesSearch =
+          query.isEmpty ||
+          product.name.toLowerCase().contains(query) ||
+          product.category.toLowerCase().contains(query);
+      if (matchesCategory && matchesSearch) {
+        results.add(product);
+      }
+    }
+
+    // The small "x" button that clears the search field.
+    Widget? clearButton;
+    if (searchText.isEmpty) {
+      clearButton = null;
+    } else {
+      clearButton = IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          searchController.clear();
+          setState(() {
+            searchText = '';
+          });
+        },
+      );
+    }
+
+    // One chip for every category.
+    List<Widget> categoryChips = [];
+    for (int i = 0; i < categories.length; i++) {
+      String category = categories[i];
+      categoryChips.add(
+        Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: ChoiceChip(
+            label: Text(category),
+            selected: selectedCategory == category,
+            onSelected: (value) {
+              setState(() {
+                selectedCategory = category;
+              });
+            },
+            showCheckmark: false,
+            backgroundColor: Colors.white,
+            selectedColor: AppColors.adminPrimary,
+            side: const BorderSide(color: AppColors.adminPrimary),
+            labelStyle: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: selectedCategory == category
+                  ? Colors.white
+                  : AppColors.adminPrimary,
+            ),
+          ),
+        ),
+      );
+    }
+
+    // The list of products, or a message when nothing matches.
+    Widget productsList;
+    if (results.isEmpty) {
+      productsList = const Center(
+        child: Padding(
+          padding: EdgeInsets.all(30),
+          child: Text(
+            'No products found',
+            style: TextStyle(color: AppColors.grey),
+          ),
+        ),
+      );
+    } else {
+      productsList = ListView.builder(
+        padding: const EdgeInsets.fromLTRB(18, 8, 18, 90),
+        itemCount: results.length,
+        itemBuilder: (context, index) {
+          final product = results[index];
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(14),
+            decoration: cardDecoration(),
+            child: Row(
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: AppColors.adminPrimary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.water_drop_outlined,
+                    color: AppColors.adminPrimary,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Text(
+                            product.category,
+                            style: const TextStyle(
+                              color: AppColors.grey,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          statusChip(product.stock),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '₹${product.price.toStringAsFixed(0)}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: AppColors.adminPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Column(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        editProduct(product);
+                      },
+                      icon: const Icon(
+                        Icons.edit_outlined,
+                        color: AppColors.adminPrimary,
+                      ),
+                      tooltip: 'Edit',
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        confirmDelete(product);
+                      },
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: AppColors.danger,
+                      ),
+                      tooltip: 'Delete',
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColors.adminBackground,
@@ -202,7 +357,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const AddProductScreen()),
+            MaterialPageRoute(builder: (context) => const AddProductScreen()),
           );
         },
         icon: const Icon(Icons.add),
@@ -226,17 +381,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   Icons.search,
                   color: AppColors.adminPrimary,
                 ),
-                suffixIcon: searchText.isEmpty
-                    ? null
-                    : IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          searchController.clear();
-                          setState(() {
-                            searchText = '';
-                          });
-                        },
-                      ),
+                suffixIcon: clearButton,
                 filled: true,
                 fillColor: Colors.white,
                 contentPadding: const EdgeInsets.symmetric(vertical: 14),
@@ -252,153 +397,26 @@ class _ProductsScreenState extends State<ProductsScreen> {
             child: ListView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.fromLTRB(18, 12, 18, 0),
-              children: [
-                for (final category in categories)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(category),
-                      selected: selectedCategory == category,
-                      onSelected: (value) {
-                        setState(() {
-                          selectedCategory = category;
-                        });
-                      },
-                      showCheckmark: false,
-                      backgroundColor: Colors.white,
-                      selectedColor: AppColors.adminPrimary,
-                      side: const BorderSide(color: AppColors.adminPrimary),
-                      labelStyle: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: selectedCategory == category
-                            ? Colors.white
-                            : AppColors.adminPrimary,
-                      ),
-                    ),
-                  ),
-              ],
+              children: categoryChips,
             ),
           ),
-          Expanded(
-            child: results.isEmpty
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(30),
-                      child: Text(
-                        'No products found',
-                        style: TextStyle(color: AppColors.grey),
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(18, 8, 18, 90),
-                    itemCount: results.length,
-                    itemBuilder: (context, index) {
-                      final product = results[index];
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(14),
-                        decoration: _cardDecoration(),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 46,
-                              height: 46,
-                              decoration: BoxDecoration(
-                                color: AppColors.adminPrimary.withValues(
-                                  alpha: 0.1,
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Icon(
-                                Icons.water_drop_outlined,
-                                color: AppColors.adminPrimary,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    product.name,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        product.category,
-                                        style: const TextStyle(
-                                          color: AppColors.grey,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      statusChip(product.stock),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    '₹${product.price.toStringAsFixed(0)}',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                      color: AppColors.adminPrimary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              children: [
-                                IconButton(
-                                  onPressed: () => editProduct(product),
-                                  icon: const Icon(
-                                    Icons.edit_outlined,
-                                    color: AppColors.adminPrimary,
-                                  ),
-                                  tooltip: 'Edit',
-                                ),
-                                IconButton(
-                                  onPressed: () => confirmDelete(product),
-                                  icon: const Icon(
-                                    Icons.delete_outline,
-                                    color: AppColors.danger,
-                                  ),
-                                  tooltip: 'Delete',
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-          ),
+          Expanded(child: productsList),
         ],
       ),
     );
   }
-}
 
-BoxDecoration _cardDecoration() {
-  return BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(16),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withValues(alpha: 0.06),
-        blurRadius: 8,
-        offset: const Offset(0, 3),
-      ),
-    ],
-  );
+  BoxDecoration cardDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.06),
+          blurRadius: 8,
+          offset: const Offset(0, 3),
+        ),
+      ],
+    );
+  }
 }

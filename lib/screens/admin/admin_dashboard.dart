@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../utils/app_colors.dart';
-import '../../utils/constants.dart';
-import '../../widgets/bottom_navbar.dart';
-import 'admin_login_screen.dart';
-import 'customers_screen.dart';
-import 'products_screen.dart';
-import 'add_product_screen.dart';
-import 'reports_screen.dart';
-import 'settings_screen.dart';
-import 'suppliers_screen.dart';
+import 'package:aqualoops_app/utils/app_colors.dart';
+import 'package:aqualoops_app/utils/constants.dart';
+import 'package:aqualoops_app/widgets/bottom_navbar.dart';
+import 'package:aqualoops_app/screens/admin/admin_login_screen.dart';
+import 'package:aqualoops_app/screens/admin/customers_screen.dart';
+import 'package:aqualoops_app/screens/admin/products_screen.dart';
+import 'package:aqualoops_app/screens/admin/add_product_screen.dart';
+import 'package:aqualoops_app/screens/admin/reports_screen.dart';
+import 'package:aqualoops_app/screens/admin/settings_screen.dart';
+import 'package:aqualoops_app/screens/admin/suppliers_screen.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -20,12 +20,32 @@ class AdminDashboard extends StatefulWidget {
 class _AdminDashboardState extends State<AdminDashboard> {
   int selectedIndex = 0;
 
-  late final List<Widget> pages = [
-    _DashboardHome(onOpenTab: openTab),
-    const CustomersScreen(),
-    const ProductsScreen(),
-    const SuppliersScreen(),
-    const ReportsScreen(),
+  // Demo data for the Recent Orders section.
+  final List<Map<String, dynamic>> recentOrders = [
+    {
+      'id': '#AQ-1048',
+      'customer': 'Rahul Sharma',
+      'amount': 480,
+      'status': 'Delivered',
+    },
+    {
+      'id': '#AQ-1047',
+      'customer': 'Priya Verma',
+      'amount': 240,
+      'status': 'Shipped',
+    },
+    {
+      'id': '#AQ-1046',
+      'customer': 'Amit Singh',
+      'amount': 120,
+      'status': 'Pending',
+    },
+    {
+      'id': '#AQ-1045',
+      'customer': 'Sneha Iyer',
+      'amount': 960,
+      'status': 'Delivered',
+    },
   ];
 
   void openTab(int index) {
@@ -40,7 +60,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
       backgroundColor: AppColors.adminBackground,
       body: IndexedStack(
         index: selectedIndex,
-        children: pages,
+        children: [
+          buildHome(),
+          const CustomersScreen(),
+          const ProductsScreen(),
+          const SuppliersScreen(),
+          const ReportsScreen(),
+        ],
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: selectedIndex,
@@ -76,47 +102,22 @@ class _AdminDashboardState extends State<AdminDashboard> {
       ),
     );
   }
-}
 
-// =====================================================
-// DASHBOARD HOME TAB
-// =====================================================
+  // =====================================================
+  // DASHBOARD HOME TAB
+  // =====================================================
 
-class _DashboardHome extends StatelessWidget {
-  final ValueChanged<int> onOpenTab;
-
-  final List<_RecentOrder> recentOrders = const [
-    _RecentOrder(
-      id: '#AQ-1048',
-      customer: 'Rahul Sharma',
-      amount: 480,
-      status: 'Delivered',
-    ),
-    _RecentOrder(
-      id: '#AQ-1047',
-      customer: 'Priya Verma',
-      amount: 240,
-      status: 'Shipped',
-    ),
-    _RecentOrder(
-      id: '#AQ-1046',
-      customer: 'Amit Singh',
-      amount: 120,
-      status: 'Pending',
-    ),
-    _RecentOrder(
-      id: '#AQ-1045',
-      customer: 'Sneha Iyer',
-      amount: 960,
-      status: 'Delivered',
-    ),
-  ];
-
-  const _DashboardHome({required this.onOpenTab});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget buildHome() {
     final topPadding = MediaQuery.of(context).padding.top;
+
+    // One row per recent order, with a divider in between.
+    List<Widget> orderRows = [];
+    for (int i = 0; i < recentOrders.length; i++) {
+      if (i > 0) {
+        orderRows.add(const Divider(height: 16));
+      }
+      orderRows.add(recentOrderRow(recentOrders[i]));
+    }
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(8, 8, 0, 24),
@@ -135,9 +136,7 @@ class _DashboardHome extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(9),
-              ),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(9)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -171,10 +170,7 @@ class _DashboardHome extends StatelessWidget {
                         SizedBox(height: 2),
                         Text(
                           AppConstants.demoAdminEmail,
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12,
-                          ),
+                          style: TextStyle(color: Colors.white70, fontSize: 12),
                         ),
                       ],
                     ),
@@ -184,7 +180,9 @@ class _DashboardHome extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (_) => const AdminLoginScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const AdminLoginScreen(),
+                      ),
                     );
                   },
                   icon: const Icon(Icons.logout, color: Colors.white),
@@ -193,9 +191,7 @@ class _DashboardHome extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(height: 3),
-
           // =====================================
           // STATS
           // =====================================
@@ -206,36 +202,34 @@ class _DashboardHome extends StatelessWidget {
             mainAxisSpacing: 14,
             crossAxisSpacing: 14,
             childAspectRatio: 1.7,
-            children: const [
-              _StatCard(
-                title: 'Total Sales',
-                value: '₹48,500',
-                icon: Icons.currency_rupee,
-                color: AppColors.success,
+            children: [
+              statCard(
+                'Total Sales',
+                '₹48,500',
+                Icons.currency_rupee,
+                AppColors.success,
               ),
-              _StatCard(
-                title: 'Orders',
-                value: '128',
-                icon: Icons.shopping_bag_outlined,
-                color: Colors.orange,
+              statCard(
+                'Orders',
+                '128',
+                Icons.shopping_bag_outlined,
+                Colors.orange,
               ),
-              _StatCard(
-                title: 'Customers',
-                value: '64',
-                icon: Icons.people_outline,
-                color: AppColors.primary,
+              statCard(
+                'Customers',
+                '64',
+                Icons.people_outline,
+                AppColors.primary,
               ),
-              _StatCard(
-                title: 'Products',
-                value: '12',
-                icon: Icons.inventory_2_outlined,
-                color: AppColors.adminPrimary,
+              statCard(
+                'Products',
+                '12',
+                Icons.inventory_2_outlined,
+                AppColors.adminPrimary,
               ),
             ],
           ),
-
           const SizedBox(height: 22),
-
           // =====================================
           // QUICK ACTIONS
           // =====================================
@@ -246,41 +240,31 @@ class _DashboardHome extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              _QuickAction(
-                icon: Icons.add_box_outlined,
-                label: 'Add Product',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AddProductScreen()),
-                  );
-                },
-              ),
-              _QuickAction(
-                icon: Icons.settings_outlined,
-                label: 'Settings',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                  );
-                },
-              ),
-              _QuickAction(
-                icon: Icons.local_shipping_outlined,
-                label: 'Suppliers',
-                onTap: () => onOpenTab(3),
-              ),
-              _QuickAction(
-                icon: Icons.insert_chart_outlined,
-                label: 'Reports',
-                onTap: () => onOpenTab(4),
-              ),
+              quickAction(Icons.add_box_outlined, 'Add Product', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddProductScreen(),
+                  ),
+                );
+              }),
+              quickAction(Icons.settings_outlined, 'Settings', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
+                  ),
+                );
+              }),
+              quickAction(Icons.local_shipping_outlined, 'Suppliers', () {
+                openTab(3);
+              }),
+              quickAction(Icons.insert_chart_outlined, 'Reports', () {
+                openTab(4);
+              }),
             ],
           ),
-
           const SizedBox(height: 22),
-
           // =====================================
           // RECENT ORDERS
           // =====================================
@@ -292,40 +276,18 @@ class _DashboardHome extends StatelessWidget {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: _cardDecoration(),
-            child: Column(
-              children: [
-                for (int i = 0; i < recentOrders.length; i++) ...[
-                  if (i > 0) const Divider(height: 16),
-                  _RecentOrderRow(order: recentOrders[i]),
-                ],
-              ],
-            ),
+            decoration: cardDecoration(),
+            child: Column(children: orderRows),
           ),
         ],
       ),
     );
   }
-}
 
-class _StatCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final IconData icon;
-  final Color color;
-
-  const _StatCard({
-    required this.title,
-    required this.value,
-    required this.icon,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget statCard(String title, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: _cardDecoration(),
+      decoration: cardDecoration(),
       child: Row(
         children: [
           Container(
@@ -362,28 +324,15 @@ class _StatCard extends StatelessWidget {
       ),
     );
   }
-}
 
-class _QuickAction extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _QuickAction({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget quickAction(IconData icon, String label, void Function() onTap) {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 4),
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
-          decoration: _cardDecoration(),
+          decoration: cardDecoration(),
           child: Column(
             children: [
               Icon(icon, color: AppColors.adminPrimary, size: 24),
@@ -402,15 +351,8 @@ class _QuickAction extends StatelessWidget {
       ),
     );
   }
-}
 
-class _RecentOrderRow extends StatelessWidget {
-  final _RecentOrder order;
-
-  const _RecentOrderRow({required this.order});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget recentOrderRow(Map<String, dynamic> order) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
@@ -420,7 +362,7 @@ class _RecentOrderRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                order.id,
+                '${order['id']}',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
@@ -428,7 +370,7 @@ class _RecentOrderRow extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                order.customer,
+                '${order['customer']}',
                 style: const TextStyle(color: AppColors.grey, fontSize: 12),
               ),
             ],
@@ -437,7 +379,7 @@ class _RecentOrderRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '₹${order.amount.toStringAsFixed(0)}',
+                '₹${order['amount']}',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
@@ -448,13 +390,15 @@ class _RecentOrderRow extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: order.statusColor.withValues(alpha: 0.12),
+                  color: statusColor(
+                    '${order['status']}',
+                  ).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  order.status,
+                  '${order['status']}',
                   style: TextStyle(
-                    color: order.statusColor,
+                    color: statusColor('${order['status']}'),
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
@@ -466,38 +410,28 @@ class _RecentOrderRow extends StatelessWidget {
       ),
     );
   }
-}
 
-class _RecentOrder {
-  final String id;
-  final String customer;
-  final double amount;
-  final String status;
-
-  const _RecentOrder({
-    required this.id,
-    required this.customer,
-    required this.amount,
-    required this.status,
-  });
-
-  Color get statusColor {
-    if (status == 'Delivered') return AppColors.success;
-    if (status == 'Shipped') return Colors.blue;
+  Color statusColor(String status) {
+    if (status == 'Delivered') {
+      return AppColors.success;
+    }
+    if (status == 'Shipped') {
+      return Colors.blue;
+    }
     return Colors.orange;
   }
-}
 
-BoxDecoration _cardDecoration() {
-  return BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(16),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withValues(alpha: 0.06),
-        blurRadius: 8,
-        offset: const Offset(0, 3),
-      ),
-    ],
-  );
+  BoxDecoration cardDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.06),
+          blurRadius: 8,
+          offset: const Offset(0, 3),
+        ),
+      ],
+    );
+  }
 }

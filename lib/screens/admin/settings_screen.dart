@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../utils/app_colors.dart';
-import '../../utils/constants.dart';
-import 'admin_login_screen.dart';
+import 'package:aqualoops_app/utils/app_colors.dart';
+import 'package:aqualoops_app/utils/constants.dart';
+import 'package:aqualoops_app/screens/admin/admin_login_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -143,7 +143,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Navigator.pop(dialogContext);
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (_) => const AdminLoginScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const AdminLoginScreen(),
+                  ),
                 );
               },
               child: const Text(
@@ -226,7 +228,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
           ),
-
           const SizedBox(height: 20),
           sectionTitle('PREFERENCES'),
           Container(
@@ -277,7 +278,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
           ),
-
           const SizedBox(height: 20),
           sectionTitle('GENERAL'),
           Container(
@@ -367,7 +367,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
           ),
-
           const SizedBox(height: 20),
           sectionTitle('ABOUT'),
           Container(
@@ -392,10 +391,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const Divider(height: 1),
                 ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                  leading: const Icon(
-                    Icons.logout,
-                    color: AppColors.danger,
-                  ),
+                  leading: const Icon(Icons.logout, color: AppColors.danger),
                   title: const Text(
                     'Logout',
                     style: TextStyle(

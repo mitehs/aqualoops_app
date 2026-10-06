@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../utils/app_colors.dart';
+import 'package:aqualoops_app/utils/app_colors.dart';
 
 class BottomNavItem {
   final IconData icon;
@@ -18,7 +18,7 @@ class BottomNavItem {
 /// supplier dashboards.
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
-  final ValueChanged<int> onTap;
+  final void Function(int) onTap;
   final List<BottomNavItem> items;
   final Color? selectedColor;
 
@@ -32,6 +32,18 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<BottomNavigationBarItem> navItems = [];
+    for (int i = 0; i < items.length; i++) {
+      BottomNavItem item = items[i];
+      navItems.add(
+        BottomNavigationBarItem(
+          icon: Icon(item.icon),
+          activeIcon: Icon(item.activeIcon),
+          label: item.label,
+        ),
+      );
+    }
+
     return BottomNavigationBar(
       currentIndex: currentIndex,
       type: BottomNavigationBarType.fixed,
@@ -39,15 +51,7 @@ class BottomNavBar extends StatelessWidget {
       unselectedItemColor: Colors.grey,
       showUnselectedLabels: true,
       onTap: onTap,
-      items: items
-          .map(
-            (item) => BottomNavigationBarItem(
-              icon: Icon(item.icon),
-              activeIcon: Icon(item.activeIcon),
-              label: item.label,
-            ),
-          )
-          .toList(),
+      items: navItems,
     );
   }
 }

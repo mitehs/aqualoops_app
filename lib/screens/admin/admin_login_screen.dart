@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/app_colors.dart';
-import '../../utils/constants.dart';
-import '../../widgets/custom_button.dart';
-import '../../widgets/custom_textfield.dart';
+import 'package:aqualoops_app/utils/app_colors.dart';
+import 'package:aqualoops_app/utils/constants.dart';
+import 'package:aqualoops_app/widgets/custom_button.dart';
+import 'package:aqualoops_app/widgets/custom_textfield.dart';
 
-import 'admin_dashboard.dart';
+import 'package:aqualoops_app/screens/admin/admin_dashboard.dart';
+import 'package:aqualoops_app/screens/auth/login_screen.dart';
 
 class AdminLoginScreen extends StatefulWidget {
   const AdminLoginScreen({super.key});
@@ -15,8 +16,12 @@ class AdminLoginScreen extends StatefulWidget {
 }
 
 class _AdminLoginScreenState extends State<AdminLoginScreen> {
-  final emailController = TextEditingController(text: AppConstants.demoAdminEmail);
-  final passwordController = TextEditingController(text: AppConstants.demoAdminPassword);
+  final emailController = TextEditingController(
+    text: AppConstants.demoAdminEmail,
+  );
+  final passwordController = TextEditingController(
+    text: AppConstants.demoAdminPassword,
+  );
 
   bool hidePassword = true;
   bool isLoading = false;
@@ -32,26 +37,25 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   Future<void> login() async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
-
     if (email.isEmpty || password.isEmpty) {
-      setState(() => errorText = 'Please enter email and password');
+      setState(() {
+        errorText = 'Please enter email and password';
+      });
       return;
     }
-
     setState(() {
       isLoading = true;
       errorText = null;
     });
-
     // Simulated check - UI only, no database / API.
     await Future.delayed(const Duration(milliseconds: 700));
-
     if (!mounted) return;
-
     // Simulated login - any non-empty email & password opens the dashboard.
-    Navigator.pushReplacement(
+    // Remove every earlier screen so the back button never returns to Login.
+    Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => const AdminDashboard()),
+      MaterialPageRoute(builder: (context) => const AdminDashboard()),
+      (route) => false,
     );
   }
 
@@ -124,13 +128,16 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     hidePassword ? Icons.visibility : Icons.visibility_off,
                   ),
                   onPressed: () {
-                    setState(() => hidePassword = !hidePassword);
+                    setState(() {
+                      hidePassword = !hidePassword;
+                    });
                   },
                 ),
               ),
 
-              if (errorText != null) ...[
-                const SizedBox(height: 14),
+              if (errorText != null) const SizedBox(height: 14),
+
+              if (errorText != null)
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -139,8 +146,11 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.error_outline,
-                          color: AppColors.danger, size: 18),
+                      const Icon(
+                        Icons.error_outline,
+                        color: AppColors.danger,
+                        size: 18,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -154,7 +164,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     ],
                   ),
                 ),
-              ],
 
               const SizedBox(height: 26),
 
@@ -168,7 +177,14 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
               const SizedBox(height: 16),
 
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
+                  );
+                },
                 child: const Text('← Back to Customer Login'),
               ),
 

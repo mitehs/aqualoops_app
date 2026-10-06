@@ -11,7 +11,7 @@ class CustomTextField extends StatelessWidget {
   final int maxLines;
   final bool readOnly;
   final String? initialValue;
-  final ValueChanged<String>? onChanged;
+  final void Function(String)? onChanged;
   final VoidCallback? onTap;
   final String? Function(String?)? validator;
 
@@ -34,6 +34,11 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget? prefix;
+    if (prefixIcon != null) {
+      prefix = Icon(prefixIcon);
+    }
+
     return TextFormField(
       controller: controller,
       initialValue: initialValue,
@@ -47,7 +52,7 @@ class CustomTextField extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: prefixIcon == null ? null : Icon(prefixIcon),
+        prefixIcon: prefix,
         suffixIcon: suffixIcon,
         border: const OutlineInputBorder(),
       ),

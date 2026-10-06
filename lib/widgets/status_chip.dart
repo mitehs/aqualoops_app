@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../utils/app_colors.dart';
+import 'package:aqualoops_app/utils/app_colors.dart';
 
 /// Small pill that shows a coloured order / account status.
 class StatusChip extends StatelessWidget {
@@ -11,7 +11,6 @@ class StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = colorFor(label);
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(

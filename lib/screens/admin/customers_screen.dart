@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../utils/app_colors.dart';
-import '../../widgets/custom_button.dart';
+import 'package:aqualoops_app/utils/app_colors.dart';
+import 'package:aqualoops_app/widgets/custom_button.dart';
 
 class CustomersScreen extends StatefulWidget {
   const CustomersScreen({super.key});
@@ -14,55 +14,55 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
   String searchText = '';
 
-  final List<_DemoCustomer> customers = const [
-    _DemoCustomer(
-      name: 'Rahul Sharma',
-      email: 'rahul.sharma@gmail.com',
-      phone: '+91 98200 11223',
-      address: '221, MG Road, Indore',
-      orders: 18,
-      totalSpent: 4260,
-    ),
-    _DemoCustomer(
-      name: 'Priya Verma',
-      email: 'priya.verma@gmail.com',
-      phone: '+91 98933 44556',
-      address: '12, Scheme No. 54, Indore',
-      orders: 12,
-      totalSpent: 2880,
-    ),
-    _DemoCustomer(
-      name: 'Amit Singh',
-      email: 'amit.singh@gmail.com',
-      phone: '+91 99775 66112',
-      address: '88, Palasia Main Road, Indore',
-      orders: 9,
-      totalSpent: 2160,
-    ),
-    _DemoCustomer(
-      name: 'Sneha Iyer',
-      email: 'sneha.iyer@gmail.com',
-      phone: '+91 97551 22889',
-      address: '5, Vijay Nagar, Indore',
-      orders: 22,
-      totalSpent: 6140,
-    ),
-    _DemoCustomer(
-      name: 'Vikas Patil',
-      email: 'vikas.patil@gmail.com',
-      phone: '+91 96912 34501',
-      address: '41, Rau Colony, Indore',
-      orders: 5,
-      totalSpent: 1080,
-    ),
-    _DemoCustomer(
-      name: 'Anjali Deshmukh',
-      email: 'anjali.deshmukh@gmail.com',
-      phone: '+91 95221 77340',
-      address: '7, Bhawarkua Main Road, Indore',
-      orders: 14,
-      totalSpent: 3520,
-    ),
+  final List<Map<String, dynamic>> customers = [
+    {
+      'name': 'Rahul Sharma',
+      'email': 'rahul.sharma@gmail.com',
+      'phone': '+91 98200 11223',
+      'address': '221, MG Road, Indore',
+      'orders': 18,
+      'totalSpent': 4260,
+    },
+    {
+      'name': 'Priya Verma',
+      'email': 'priya.verma@gmail.com',
+      'phone': '+91 98933 44556',
+      'address': '12, Scheme No. 54, Indore',
+      'orders': 12,
+      'totalSpent': 2880,
+    },
+    {
+      'name': 'Amit Singh',
+      'email': 'amit.singh@gmail.com',
+      'phone': '+91 99775 66112',
+      'address': '88, Palasia Main Road, Indore',
+      'orders': 9,
+      'totalSpent': 2160,
+    },
+    {
+      'name': 'Sneha Iyer',
+      'email': 'sneha.iyer@gmail.com',
+      'phone': '+91 97551 22889',
+      'address': '5, Vijay Nagar, Indore',
+      'orders': 22,
+      'totalSpent': 6140,
+    },
+    {
+      'name': 'Vikas Patil',
+      'email': 'vikas.patil@gmail.com',
+      'phone': '+91 96912 34501',
+      'address': '41, Rau Colony, Indore',
+      'orders': 5,
+      'totalSpent': 1080,
+    },
+    {
+      'name': 'Anjali Deshmukh',
+      'email': 'anjali.deshmukh@gmail.com',
+      'phone': '+91 95221 77340',
+      'address': '7, Bhawarkua Main Road, Indore',
+      'orders': 14,
+      'totalSpent': 3520,
+    },
   ];
 
   @override
@@ -71,21 +71,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
     super.dispose();
   }
 
-  List<_DemoCustomer> get filteredCustomers {
-    final query = searchText.trim().toLowerCase();
-    if (query.isEmpty) return customers;
-
-    return customers
-        .where(
-          (customer) =>
-              customer.name.toLowerCase().contains(query) ||
-              customer.email.toLowerCase().contains(query) ||
-              customer.phone.contains(query),
-        )
-        .toList();
-  }
-
-  void showCustomerDetails(_DemoCustomer customer) {
+  void showCustomerDetails(Map<String, dynamic> customer) {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.white,
@@ -119,7 +105,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                         alpha: 0.12,
                       ),
                       child: Text(
-                        customer.initials,
+                        initialsOf('${customer['name']}'),
                         style: const TextStyle(
                           color: AppColors.adminPrimary,
                           fontWeight: FontWeight.bold,
@@ -132,7 +118,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            customer.name,
+                            '${customer['name']}',
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -140,7 +126,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            customer.email,
+                            '${customer['email']}',
                             style: const TextStyle(
                               color: AppColors.grey,
                               fontSize: 13,
@@ -152,21 +138,18 @@ class _CustomersScreenState extends State<CustomersScreen> {
                   ],
                 ),
                 const SizedBox(height: 18),
-                _detailRow(Icons.phone_outlined, customer.phone),
+                detailRow(Icons.phone_outlined, '${customer['phone']}'),
                 const SizedBox(height: 10),
-                _detailRow(
-                  Icons.location_on_outlined,
-                  customer.address,
-                ),
+                detailRow(Icons.location_on_outlined, '${customer['address']}'),
                 const SizedBox(height: 10),
-                _detailRow(
+                detailRow(
                   Icons.receipt_long_outlined,
-                  '${customer.orders} total orders',
+                  '${customer['orders']} total orders',
                 ),
                 const SizedBox(height: 10),
-                _detailRow(
+                detailRow(
                   Icons.currency_rupee,
-                  '₹${customer.totalSpent.toStringAsFixed(0)} total spent',
+                  '₹${customer['totalSpent']} total spent',
                 ),
                 const SizedBox(height: 20),
                 CustomButton(
@@ -177,7 +160,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                     Navigator.pop(sheetContext);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('${customer.name} blocked (demo)'),
+                        content: Text('${customer['name']} blocked (demo)'),
                       ),
                     );
                   },
@@ -190,27 +173,163 @@ class _CustomersScreenState extends State<CustomersScreen> {
     );
   }
 
-  Widget _detailRow(IconData icon, String value) {
+  Widget detailRow(IconData icon, String value) {
     return Row(
       children: [
         Icon(icon, size: 18, color: AppColors.adminPrimary),
         const SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(fontSize: 14),
-          ),
-        ),
+        Expanded(child: Text(value, style: const TextStyle(fontSize: 14))),
       ],
     );
   }
 
+  // The short letters shown inside the round avatar.
+  String initialsOf(String name) {
+    List<String> parts = name.split(' ');
+    String letters = '';
+    for (int i = 0; i < parts.length && i < 2; i++) {
+      letters = letters + parts[i][0];
+    }
+    return letters.toUpperCase();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final results = filteredCustomers;
-    final summary = searchText.trim().isEmpty
-        ? '64 customers'
-        : '${results.length} customers found';
+    // The customers that match what was typed in the search field.
+    String query = searchText.trim().toLowerCase();
+    List<Map<String, dynamic>> results;
+    if (query.isEmpty) {
+      results = customers;
+    } else {
+      results = [];
+      for (int i = 0; i < customers.length; i++) {
+        Map<String, dynamic> customer = customers[i];
+        String name = customer['name'];
+        String email = customer['email'];
+        String phone = customer['phone'];
+        bool matchesName = name.toLowerCase().contains(query);
+        bool matchesEmail = email.toLowerCase().contains(query);
+        bool matchesPhone = phone.contains(query);
+        if (matchesName || matchesEmail || matchesPhone) {
+          results.add(customer);
+        }
+      }
+    }
+
+    String summary = '';
+    if (searchText.trim().isEmpty) {
+      summary = '64 customers';
+    } else {
+      summary = '${results.length} customers found';
+    }
+
+    // The small "x" button that clears the search field.
+    Widget? clearButton;
+    if (searchText.isEmpty) {
+      clearButton = null;
+    } else {
+      clearButton = IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          searchController.clear();
+          setState(() {
+            searchText = '';
+          });
+        },
+      );
+    }
+
+    // The list of customers, or a message when nothing matches.
+    Widget customersList;
+    if (results.isEmpty) {
+      customersList = const Center(
+        child: Padding(
+          padding: EdgeInsets.all(30),
+          child: Text(
+            'No customers found',
+            style: TextStyle(color: AppColors.grey),
+          ),
+        ),
+      );
+    } else {
+      customersList = ListView.builder(
+        padding: const EdgeInsets.fromLTRB(18, 8, 18, 18),
+        itemCount: results.length,
+        itemBuilder: (context, index) {
+          final customer = results[index];
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: cardDecoration(),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 6,
+              ),
+              onTap: () {
+                showCustomerDetails(customer);
+              },
+              leading: CircleAvatar(
+                radius: 24,
+                backgroundColor: AppColors.adminPrimary.withValues(alpha: 0.12),
+                child: Text(
+                  initialsOf('${customer['name']}'),
+                  style: const TextStyle(
+                    color: AppColors.adminPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              title: Text(
+                '${customer['name']}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 2),
+                  Text(
+                    '${customer['email']}',
+                    style: const TextStyle(color: AppColors.grey, fontSize: 12),
+                  ),
+                  Text(
+                    '${customer['phone']}',
+                    style: const TextStyle(color: AppColors.grey, fontSize: 12),
+                  ),
+                ],
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.adminPrimary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${customer['orders']} orders',
+                      style: const TextStyle(
+                        color: AppColors.adminPrimary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.chevron_right, color: AppColors.grey),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColors.adminBackground,
@@ -238,17 +357,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                   Icons.search,
                   color: AppColors.adminPrimary,
                 ),
-                suffixIcon: searchText.isEmpty
-                    ? null
-                    : IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          searchController.clear();
-                          setState(() {
-                            searchText = '';
-                          });
-                        },
-                      ),
+                suffixIcon: clearButton,
                 filled: true,
                 fillColor: Colors.white,
                 contentPadding: const EdgeInsets.symmetric(vertical: 14),
@@ -269,148 +378,23 @@ class _CustomersScreenState extends State<CustomersScreen> {
               ),
             ),
           ),
-          Expanded(
-            child: results.isEmpty
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(30),
-                      child: Text(
-                        'No customers found',
-                        style: TextStyle(color: AppColors.grey),
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(18, 8, 18, 18),
-                    itemCount: results.length,
-                    itemBuilder: (context, index) {
-                      final customer = results[index];
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        decoration: _cardDecoration(),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 6,
-                          ),
-                          onTap: () => showCustomerDetails(customer),
-                          leading: CircleAvatar(
-                            radius: 24,
-                            backgroundColor: AppColors.adminPrimary.withValues(
-                              alpha: 0.12,
-                            ),
-                            child: Text(
-                              customer.initials,
-                              style: const TextStyle(
-                                color: AppColors.adminPrimary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          title: Text(
-                            customer.name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 2),
-                              Text(
-                                customer.email,
-                                style: const TextStyle(
-                                  color: AppColors.grey,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              Text(
-                                customer.phone,
-                                style: const TextStyle(
-                                  color: AppColors.grey,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.adminPrimary.withValues(
-                                    alpha: 0.1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  '${customer.orders} orders',
-                                  style: const TextStyle(
-                                    color: AppColors.adminPrimary,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(
-                                Icons.chevron_right,
-                                color: AppColors.grey,
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
+          Expanded(child: customersList),
         ],
       ),
     );
   }
-}
 
-class _DemoCustomer {
-  final String name;
-  final String email;
-  final String phone;
-  final String address;
-  final int orders;
-  final double totalSpent;
-
-  const _DemoCustomer({
-    required this.name,
-    required this.email,
-    required this.phone,
-    required this.address,
-    required this.orders,
-    required this.totalSpent,
-  });
-
-  String get initials => name
-      .split(' ')
-      .map((word) => word[0])
-      .take(2)
-      .join()
-      .toUpperCase();
-}
-
-BoxDecoration _cardDecoration() {
-  return BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(16),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withValues(alpha: 0.06),
-        blurRadius: 8,
-        offset: const Offset(0, 3),
-      ),
-    ],
-  );
+  BoxDecoration cardDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.06),
+          blurRadius: 8,
+          offset: const Offset(0, 3),
+        ),
+      ],
+    );
+  }
 }

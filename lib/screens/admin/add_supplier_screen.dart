@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../models/supplier.dart';
-import '../../utils/app_colors.dart';
-import '../../widgets/custom_button.dart';
-import '../../widgets/custom_textfield.dart';
+import 'package:aqualoops_app/models/supplier.dart';
+import 'package:aqualoops_app/utils/app_colors.dart';
+import 'package:aqualoops_app/widgets/custom_button.dart';
+import 'package:aqualoops_app/widgets/custom_textfield.dart';
 
 class AddSupplierScreen extends StatefulWidget {
   const AddSupplierScreen({super.key});
@@ -37,15 +37,13 @@ class _AddSupplierScreenState extends State<AddSupplierScreen> {
   }
 
   Future<void> save() async {
-    if (!(formKey.currentState?.validate() ?? false)) return;
-
+    if (!formKey.currentState!.validate()) {
+      return;
+    }
     setState(() => isSaving = true);
-
     // Simulated save - UI only, no database / API.
     await Future.delayed(const Duration(milliseconds: 600));
-
     if (!mounted) return;
-
     // Hand the new supplier back so it appears in the list immediately.
     Navigator.pop(
       context,
@@ -67,6 +65,13 @@ class _AddSupplierScreenState extends State<AddSupplierScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Build the choices of the vehicle dropdown first.
+    List<DropdownMenuItem<String>> vehicleItems = [];
+    for (int i = 0; i < vehicleTypes.length; i++) {
+      String type = vehicleTypes[i];
+      vehicleItems.add(DropdownMenuItem(value: type, child: Text(type)));
+    }
+
     return Scaffold(
       backgroundColor: AppColors.adminBackground,
       appBar: AppBar(
@@ -114,18 +119,14 @@ class _AddSupplierScreenState extends State<AddSupplierScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 24),
-
               CustomTextField(
                 controller: nameController,
                 label: 'Full Name',
                 prefixIcon: Icons.person_outline,
                 validator: (value) => _required(value, 'Name is required'),
               ),
-
               const SizedBox(height: 16),
-
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -160,20 +161,15 @@ class _AddSupplierScreenState extends State<AddSupplierScreen> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 16),
-
               CustomTextField(
                 controller: routeController,
                 label: 'Delivery Route / Area',
                 prefixIcon: Icons.route_outlined,
                 hint: 'e.g. Bengaluru North Route',
-                validator: (value) =>
-                    _required(value, 'Route is required'),
+                validator: (value) => _required(value, 'Route is required'),
               ),
-
               const SizedBox(height: 16),
-
               DropdownButtonFormField<String>(
                 initialValue: vehicleType,
                 decoration: const InputDecoration(
@@ -181,21 +177,12 @@ class _AddSupplierScreenState extends State<AddSupplierScreen> {
                   prefixIcon: Icon(Icons.directions_bike_outlined),
                   border: OutlineInputBorder(),
                 ),
-                items: vehicleTypes
-                    .map(
-                      (type) => DropdownMenuItem(
-                        value: type,
-                        child: Text(type),
-                      ),
-                    )
-                    .toList(),
+                items: vehicleItems,
                 onChanged: (value) {
                   if (value != null) setState(() => vehicleType = value);
                 },
               ),
-
               const SizedBox(height: 16),
-
               CustomTextField(
                 controller: passwordController,
                 label: 'Temporary Password',
@@ -209,16 +196,13 @@ class _AddSupplierScreenState extends State<AddSupplierScreen> {
                   return null;
                 },
               ),
-
               const SizedBox(height: 26),
-
               CustomButton(
                 label: 'ADD SUPPLIER',
                 color: AppColors.adminPrimary,
                 isLoading: isSaving,
                 onPressed: save,
               ),
-
               const SizedBox(height: 10),
             ],
           ),

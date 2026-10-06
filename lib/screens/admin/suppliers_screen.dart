@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../models/supplier.dart';
-import '../../utils/app_colors.dart';
-import '../../widgets/status_chip.dart';
+import 'package:aqualoops_app/models/supplier.dart';
+import 'package:aqualoops_app/utils/app_colors.dart';
+import 'package:aqualoops_app/widgets/status_chip.dart';
 
-import 'add_supplier_screen.dart';
+import 'package:aqualoops_app/screens/admin/add_supplier_screen.dart';
 
 class SuppliersScreen extends StatefulWidget {
   const SuppliersScreen({super.key});
@@ -69,37 +69,36 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
   }
 
   int countFor(String value) {
-    if (value == 'Active') return suppliers.where((s) => s.available).length;
-    if (value == 'Inactive') return suppliers.where((s) => !s.available).length;
+    if (value == 'Active') {
+      int count = 0;
+      for (Supplier supplier in suppliers) {
+        if (supplier.available) {
+          count = count + 1;
+        }
+      }
+      return count;
+    }
+    if (value == 'Inactive') {
+      int count = 0;
+      for (Supplier supplier in suppliers) {
+        if (!supplier.available) {
+          count = count + 1;
+        }
+      }
+      return count;
+    }
     return suppliers.length;
   }
 
-  List<Supplier> get visibleSuppliers {
-    return suppliers.where((supplier) {
-      final matchesFilter = filter == 'All' ||
-          (filter == 'Active' && supplier.available) ||
-          (filter == 'Inactive' && !supplier.available);
-
-      final query = searchText.toLowerCase();
-      final matchesSearch = query.isEmpty ||
-          supplier.name.toLowerCase().contains(query) ||
-          supplier.route.toLowerCase().contains(query) ||
-          supplier.phone.contains(query);
-
-      return matchesFilter && matchesSearch;
-    }).toList();
-  }
-
   Future<void> addSupplier() async {
-    final newSupplier = await Navigator.push<Supplier>(
+    Supplier? newSupplier = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const AddSupplierScreen()),
+      MaterialPageRoute(builder: (context) => const AddSupplierScreen()),
     );
-
-    if (newSupplier == null || !mounted) return;
-
+    if (newSupplier == null || !mounted) {
+      return;
+    }
     setState(() => suppliers.insert(0, newSupplier));
-
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('${newSupplier.name} added to your team')),
     );
@@ -114,155 +113,162 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
       builder: (sheetContext) {
         return StatefulBuilder(
           builder: (context, setSheetState) {
+            // Build the rows of the sheet first, one by one.
+            List<Widget> sheetChildren = [];
+
+            // Grabber
+            sheetChildren.add(
+              Center(
+                child: Container(
+                  width: 44,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.lightGrey,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            );
+            sheetChildren.add(const SizedBox(height: 18));
+
+            sheetChildren.add(
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 26,
+                    backgroundColor: AppColors.adminPrimary.withValues(
+                      alpha: 0.12,
+                    ),
+                    child: Text(
+                      supplier.name.isNotEmpty
+                          ? supplier.name[0].toUpperCase()
+                          : '?',
+                      style: const TextStyle(
+                        color: AppColors.adminPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          supplier.name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          supplier.route,
+                          style: const TextStyle(
+                            color: AppColors.grey,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  StatusChip(label: supplier.available ? 'Active' : 'Inactive'),
+                ],
+              ),
+            );
+            sheetChildren.add(const SizedBox(height: 18));
+
+            sheetChildren.add(infoRow(Icons.phone_outlined, supplier.phone));
+            if (supplier.email.isNotEmpty) {
+              sheetChildren.add(infoRow(Icons.email_outlined, supplier.email));
+            }
+            if (supplier.vehicle.isNotEmpty) {
+              sheetChildren.add(
+                infoRow(
+                  Icons.directions_bike_outlined,
+                  '${supplier.vehicle} · ${supplier.earnings > 0 ? '₹${supplier.earnings.toStringAsFixed(0)} earned' : 'No earnings yet'}',
+                ),
+              );
+            } else if (supplier.earnings > 0) {
+              sheetChildren.add(
+                infoRow(
+                  Icons.currency_rupee,
+                  '₹${supplier.earnings.toStringAsFixed(0)} earned',
+                ),
+              );
+            }
+
+            sheetChildren.add(const SizedBox(height: 6));
+
+            sheetChildren.add(
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                value: supplier.available,
+                activeThumbColor: Colors.white,
+                activeTrackColor: AppColors.adminPrimary,
+                title: const Text(
+                  'Available for deliveries',
+                  style: TextStyle(fontSize: 14),
+                ),
+                onChanged: (value) {
+                  setSheetState(() => supplier.available = value);
+                  setState(() {});
+                },
+              ),
+            );
+            sheetChildren.add(const SizedBox(height: 10));
+
+            sheetChildren.add(
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.adminPrimary,
+                        side: const BorderSide(color: AppColors.adminPrimary),
+                        minimumSize: const Size(0, 48),
+                      ),
+                      icon: const Icon(Icons.call, size: 18),
+                      label: const Text('Call'),
+                      onPressed: () {
+                        Navigator.pop(sheetContext);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Calling ${supplier.name}…')),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.adminPrimary,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(0, 48),
+                      ),
+                      icon: const Icon(Icons.chat_bubble_outline, size: 18),
+                      label: const Text('Message'),
+                      onPressed: () {
+                        Navigator.pop(sheetContext);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Message sent to ${supplier.name}'),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+
             return Padding(
               padding: const EdgeInsets.fromLTRB(22, 18, 22, 26),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Grabber
-                  Center(
-                    child: Container(
-                      width: 44,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: AppColors.lightGrey,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 26,
-                        backgroundColor:
-                            AppColors.adminPrimary.withValues(alpha: 0.12),
-                        child: Text(
-                          supplier.name.isNotEmpty
-                              ? supplier.name[0].toUpperCase()
-                              : '?',
-                          style: const TextStyle(
-                            color: AppColors.adminPrimary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              supplier.name,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              supplier.route,
-                              style: const TextStyle(
-                                color: AppColors.grey,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      StatusChip(
-                        label: supplier.available ? 'Active' : 'Inactive',
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  _infoRow(Icons.phone_outlined, supplier.phone),
-                  if (supplier.email.isNotEmpty)
-                    _infoRow(Icons.email_outlined, supplier.email),
-                  if (supplier.vehicle.isNotEmpty)
-                    _infoRow(
-                      Icons.directions_bike_outlined,
-                      '${supplier.vehicle} · ${supplier.earnings > 0 ? '₹${supplier.earnings.toStringAsFixed(0)} earned' : 'No earnings yet'}',
-                    )
-                  else if (supplier.earnings > 0)
-                    _infoRow(
-                      Icons.currency_rupee,
-                      '₹${supplier.earnings.toStringAsFixed(0)} earned',
-                    ),
-
-                  const SizedBox(height: 6),
-
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    value: supplier.available,
-                    activeThumbColor: Colors.white,
-                    activeTrackColor: AppColors.adminPrimary,
-                    title: const Text(
-                      'Available for deliveries',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    onChanged: (value) {
-                      setSheetState(() => supplier.available = value);
-                      setState(() {});
-                    },
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.adminPrimary,
-                            side: const BorderSide(
-                              color: AppColors.adminPrimary,
-                            ),
-                            minimumSize: const Size(0, 48),
-                          ),
-                          icon: const Icon(Icons.call, size: 18),
-                          label: const Text('Call'),
-                          onPressed: () {
-                            Navigator.pop(sheetContext);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Calling ${supplier.name}…'),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.adminPrimary,
-                            foregroundColor: Colors.white,
-                            minimumSize: const Size(0, 48),
-                          ),
-                          icon: const Icon(Icons.chat_bubble_outline, size: 18),
-                          label: const Text('Message'),
-                          onPressed: () {
-                            Navigator.pop(sheetContext);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Message sent to ${supplier.name}',
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                children: sheetChildren,
               ),
             );
           },
@@ -271,16 +277,14 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
     );
   }
 
-  Widget _infoRow(IconData icon, String value) {
+  Widget infoRow(IconData icon, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
           Icon(icon, size: 18, color: AppColors.adminPrimary),
           const SizedBox(width: 10),
-          Expanded(
-            child: Text(value, style: const TextStyle(fontSize: 14)),
-          ),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 14))),
         ],
       ),
     );
@@ -288,7 +292,146 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final list = visibleSuppliers;
+    // The suppliers that match the filter and the search text.
+    List<Supplier> list = [];
+    String query = searchText.toLowerCase();
+    for (Supplier supplier in suppliers) {
+      bool matchesFilter =
+          filter == 'All' ||
+          (filter == 'Active' && supplier.available) ||
+          (filter == 'Inactive' && !supplier.available);
+      bool matchesSearch =
+          query.isEmpty ||
+          supplier.name.toLowerCase().contains(query) ||
+          supplier.route.toLowerCase().contains(query) ||
+          supplier.phone.contains(query);
+      if (matchesFilter && matchesSearch) {
+        list.add(supplier);
+      }
+    }
+
+    // Build the filter chips first.
+    List<String> filterValues = ['All', 'Active', 'Inactive'];
+    List<Widget> filterChips = [];
+    for (int i = 0; i < filterValues.length; i++) {
+      String value = filterValues[i];
+      filterChips.add(
+        Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: ChoiceChip(
+            label: Text('$value  ${countFor(value)}'),
+            selected: filter == value,
+            selectedColor: AppColors.adminPrimary,
+            backgroundColor: Colors.white,
+            labelStyle: TextStyle(
+              color: filter == value ? Colors.white : AppColors.grey,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+            onSelected: (_) => setState(() => filter = value),
+          ),
+        ),
+      );
+    }
+
+    // The little X button of the search field.
+    Widget? clearSuffix;
+    if (searchText.isNotEmpty) {
+      clearSuffix = IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          searchController.clear();
+          setState(() => searchText = '');
+        },
+      );
+    }
+
+    // Either the empty message or the list of suppliers.
+    Widget body;
+    if (list.isEmpty) {
+      body = const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.person_search_outlined, size: 54, color: AppColors.grey),
+            SizedBox(height: 12),
+            Text(
+              'No suppliers found',
+              style: TextStyle(color: AppColors.grey, fontSize: 15),
+            ),
+            SizedBox(height: 4),
+            Text(
+              'Try a different search or filter',
+              style: TextStyle(color: AppColors.grey, fontSize: 12),
+            ),
+          ],
+        ),
+      );
+    } else {
+      body = ListView.builder(
+        padding: const EdgeInsets.fromLTRB(18, 12, 18, 96),
+        itemCount: list.length,
+        itemBuilder: (context, index) {
+          final supplier = list[index];
+          return Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 6,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              leading: CircleAvatar(
+                radius: 22,
+                backgroundColor: AppColors.adminPrimary.withValues(alpha: 0.12),
+                child: Text(
+                  supplier.name.isNotEmpty
+                      ? supplier.name[0].toUpperCase()
+                      : '?',
+                  style: const TextStyle(
+                    color: AppColors.adminPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              title: Text(
+                supplier.name,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                ),
+              ),
+              subtitle: Text(
+                '${supplier.route}\n₹${supplier.earnings.toStringAsFixed(0)} earned',
+                style: const TextStyle(
+                  color: AppColors.grey,
+                  fontSize: 12,
+                  height: 1.4,
+                ),
+              ),
+              isThreeLine: true,
+              trailing: StatusChip(
+                label: supplier.available ? 'Active' : 'Inactive',
+              ),
+              onTap: () => openDetails(supplier),
+            ),
+          );
+        },
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColors.adminBackground,
@@ -317,15 +460,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
               decoration: InputDecoration(
                 hintText: 'Search name, route or phone...',
                 prefixIcon: const Icon(Icons.search, color: AppColors.primary),
-                suffixIcon: searchText.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          searchController.clear();
-                          setState(() => searchText = '');
-                        },
-                      )
-                    : null,
+                suffixIcon: clearSuffix,
                 filled: true,
                 fillColor: Colors.white,
                 contentPadding: const EdgeInsets.symmetric(vertical: 0),
@@ -336,131 +471,12 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
               ),
             ),
           ),
-
           // Filters
           Padding(
             padding: const EdgeInsets.fromLTRB(18, 12, 18, 0),
-            child: Row(
-              children: ['All', 'Active', 'Inactive']
-                  .map(
-                    (value) => Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(
-                        label: Text('$value  ${countFor(value)}'),
-                        selected: filter == value,
-                        selectedColor: AppColors.adminPrimary,
-                        backgroundColor: Colors.white,
-                        labelStyle: TextStyle(
-                          color: filter == value
-                              ? Colors.white
-                              : AppColors.grey,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                        onSelected: (_) => setState(() => filter = value),
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
+            child: Row(children: filterChips),
           ),
-
-          Expanded(
-            child: list.isEmpty
-                ? const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.person_search_outlined,
-                          size: 54,
-                          color: AppColors.grey,
-                        ),
-                        SizedBox(height: 12),
-                        Text(
-                          'No suppliers found',
-                          style: TextStyle(
-                            color: AppColors.grey,
-                            fontSize: 15,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Try a different search or filter',
-                          style: TextStyle(
-                            color: AppColors.grey,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(18, 12, 18, 96),
-                    itemCount: list.length,
-                    itemBuilder: (context, index) {
-                      final supplier = list[index];
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 6,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          leading: CircleAvatar(
-                            radius: 22,
-                            backgroundColor: AppColors.adminPrimary
-                                .withValues(alpha: 0.12),
-                            child: Text(
-                              supplier.name.isNotEmpty
-                                  ? supplier.name[0].toUpperCase()
-                                  : '?',
-                              style: const TextStyle(
-                                color: AppColors.adminPrimary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          title: Text(
-                            supplier.name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                            ),
-                          ),
-                          subtitle: Text(
-                            '${supplier.route}\n₹${supplier.earnings.toStringAsFixed(0)} earned',
-                            style: const TextStyle(
-                              color: AppColors.grey,
-                              fontSize: 12,
-                              height: 1.4,
-                            ),
-                          ),
-                          isThreeLine: true,
-                          trailing: StatusChip(
-                            label: supplier.available ? 'Active' : 'Inactive',
-                          ),
-                          onTap: () => openDetails(supplier),
-                        ),
-                      );
-                    },
-                  ),
-          ),
+          Expanded(child: body),
         ],
       ),
     );
